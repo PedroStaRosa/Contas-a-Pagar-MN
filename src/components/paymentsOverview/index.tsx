@@ -66,18 +66,6 @@ const PaymentsOverview = () => {
     if (ignoreTodayChecked) {
       itemsToIterate = finances.slice(1);
     }
-
-    /*     if (ignoreTodayChecked) {
-      const firstDate = finances[0];
-      const totalReceivedFirstDate = getTotalReceived(firstDate);
-      const totalPayableFirstDate = firstDate.valueAccountsPayable ?? 0;
-      const balanceFirstDate =
-        initialBalance - totalReceivedFirstDate + totalPayableFirstDate;
-      previousBalance = balanceFirstDate;
-
-      console.log("a", balanceFirstDate);
-    } */
-
     const balanceupdated = itemsToIterate.map((obj) => {
       const totalReceived = getTotalReceived(obj);
       const totalPayable = obj.valueAccountsPayable ?? 0;

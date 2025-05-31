@@ -33,12 +33,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setLoadingAuth(true);
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      console.log(currentUser);
       if (currentUser?.uid) {
         setUserAuth(currentUser);
-        /*         const userRef = doc(db, "users", currentUser.uid);
-        const userSnapshot = await getDoc(userRef);
-        console.log(userSnapshot.data()); */
       } else {
         setUserAuth(null);
       }
@@ -51,7 +47,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (userAuth?.uid) {
       getFinances();
-      console.log("👍 Usuário autenticado");
     }
   }, [userAuth?.uid]);
 
@@ -60,7 +55,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const reponse = await fetchFinances();
       setFinances(reponse);
     } catch {
-      console.log("Erro ao buscar finanças");
+      throw new Error("Erro ao buscar finanças");
     }
   };
   // Função para login com email e senha
@@ -77,7 +72,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (UserCredential.user) {
         setUserAuth(UserCredential.user);
-        console.log(`Bem-vindo, ${UserCredential.user.displayName}`);
+
         return UserCredential.user; // ✅ Retorna o usuário autenticado corretamente
       }
       return null;
@@ -110,8 +105,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await auth.signOut();
       setUserAuth(null);
       localStorage.removeItem("@lastProtectedRoute"); // ✅ limpa rota protegida
-    } catch (error) {
-      console.error("Erro ao sair:", error);
+    } catch {
+      throw new Error("Erro ao sair.");
     }
   };
 

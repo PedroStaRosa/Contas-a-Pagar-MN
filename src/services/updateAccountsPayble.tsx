@@ -1,5 +1,6 @@
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import moment from "moment";
+import { toast } from "sonner";
 
 import { db } from "@/services/firebaseconnection";
 
@@ -55,7 +56,7 @@ export const atualizarOuCriarValorAPagar = async (
       await updateDoc(doc(db, "users", userId), {
         lastUpdatedPayments: new Date(),
       });
-      console.log(`✅ Atualizado ${dataISO} com valor ${item.valor}`);
+      toast.success(`✅ Atualizado ${dataISO} com valor ${item.valor}`);
     } catch {
       // Se não existe, cria o documento com merge
       try {
@@ -72,7 +73,7 @@ export const atualizarOuCriarValorAPagar = async (
           lastUpdatedPayments: new Date(),
         });
       } catch (err) {
-        console.error(`❌ Erro ao criar documento ${docId}:`, err);
+        throw new Error(`❌ Erro ao criar documento ${docId}: ${err}`);
       }
     }
   }

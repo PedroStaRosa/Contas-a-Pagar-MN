@@ -73,7 +73,6 @@ const AccountsPayableReader = () => {
         return;
       }
       setValores(valoresExtraidos);
-      console.log("resultado: ", valoresExtraidos);
     };
 
     reader.readAsArrayBuffer(arquivoSelecionado);
@@ -89,8 +88,8 @@ const AccountsPayableReader = () => {
       await atualizarOuCriarValorAPagar(valores, userAuth.uid);
       toast.success("Contas a pagar atualizadas com sucesso!");
       handleClearFile();
-    } catch (error) {
-      console.error("Erro ao atualizar as contas a pagar:", error);
+    } catch {
+      toast.error("Erro ao atualizar as contas a pagar:");
     } finally {
       setIsLoading(false);
     }

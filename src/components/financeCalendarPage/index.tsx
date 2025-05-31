@@ -135,7 +135,6 @@ const FinanceCalendarPage = () => {
       const dataBanco = finance.date.trim();
       return dataBanco === formatedDate;
     });
-    console.log("finance: ", finance);
     if (finance) {
       form.setValue("credito", finance.credito ?? 0);
       form.setValue("debito", finance.debito ?? 0);

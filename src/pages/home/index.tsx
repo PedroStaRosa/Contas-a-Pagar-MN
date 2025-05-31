@@ -35,10 +35,10 @@ const HomePage = () => {
 
   const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
     setLoadingLogin(false);
-    console.log(data);
+
     try {
       const user = await login(data.email, data.password);
-      console.log("Retorno: ", user);
+
       if (user) {
         toast.success(`Bem vindo! ${user.email}`);
         redirect();
