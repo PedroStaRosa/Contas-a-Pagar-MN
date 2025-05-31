@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import { UserContext } from "@/contexts/userContext";
 
-import globo from "../../assets/globo.png";
+import globo from "../../assets/Globo.png";
 import { Button } from "../ui/button";
 
 const Header = () => {
