@@ -49,7 +49,7 @@ const FinanceTable = ({ finances }: FinanceTableProps) => {
                   </TableCell>
                   <TableCell>
                     <HoverCard>
-                      <HoverCardTrigger asChild>
+                      <HoverCardTrigger>
                         <Button variant="ghost" className="text-green-500">
                           {formatCurrency(getTotalReceived(finance))}
                         </Button>
