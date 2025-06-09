@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
 import type { Finances } from "@/types/finances";
 
 export const formatCurrency = (value: number) => {
@@ -31,4 +34,29 @@ export function formatCNPJ(value: string) {
   if (digits.length <= 12)
     return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
   return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12, 14)}`;
+}
+
+// Formata uma data para "dd/MM/yyyy"
+export function formatDateBR(date: Date): string {
+  return format(date, "dd/MM/yyyy", { locale: ptBR });
+}
+
+// Converte string "dd/MM/yyyy" para objeto Date
+export function parseDateBR(dateString: string): Date {
+  const [day, month, year] = dateString.split("/").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+// Retorna o nome do dia da semana em português (segunda-feira, etc.)
+export function getWeekdayName(date: Date): string {
+  return date.toLocaleDateString("pt-BR", { weekday: "long" });
+}
+
+// Retorna valor de pagamento para uma data específica
+export function getValueForDate(
+  finances: Finances[],
+  dateString: string,
+): number {
+  const entry = finances.find((f) => f.date === dateString);
+  return entry?.valueAccountsPayable || 0;
 }
