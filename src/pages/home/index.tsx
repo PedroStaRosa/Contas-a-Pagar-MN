@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectAfterLogin } from "@/hooks/useRedirectAfterLogin";
-import { type LoginFormData, loginFormSchema } from "@/schema/loginSchema";
+import { type LoginFormData, loginFormSchema } from "@/schema/schemas";
 
 import logo from "../../assets/Logo.png";
 
