@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addDays, format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { addDays } from "date-fns";
 import { SquarePen, Trash2 } from "lucide-react";
 import { useContext, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,7 +9,13 @@ import { UserContext } from "@/contexts/userContext";
 import { type SupplierFormData, SupplierFormSchema } from "@/schema/schemas";
 import { deleteSupplier, updateSupplier } from "@/services/supplierService";
 import type { Supplier } from "@/types/supplier";
-import { formatCurrency } from "@/utils/utils";
+import {
+  formatCurrency,
+  formatDateBR,
+  getValueForDate,
+  getWeekdayName,
+  parseDateBR,
+} from "@/utils/utils";
 
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -59,22 +64,34 @@ const SupplierCard = ({ supplier, updateSupplierList }: SupplierCardProps) => {
   });
 
   const supplierWithFinance = useMemo(() => {
-    const paymentDate = format(
+    const paymentDate = formatDateBR(
       addDays(new Date(), supplier.payment_term),
-      "dd/MM/yyyy",
-      { locale: ptBR },
     );
-    const financeForPaymentDate = finances.find((f) => f.date === paymentDate);
-    const [day, month, year] = paymentDate.split("/").map(Number);
-    const date = new Date(year, month - 1, day);
-    const weekday = new Date(date).toLocaleDateString("pt-BR", {
-      weekday: "long",
-    });
+    const weekday = getWeekdayName(parseDateBR(paymentDate));
+
+    const valueForPaymentDate = getValueForDate(finances, paymentDate);
+
+    if (valueForPaymentDate && weekday === "segunda-feira") {
+      const baseDate = parseDateBR(paymentDate);
+      const saturdayDate = formatDateBR(addDays(baseDate, -2));
+      const sundayDate = formatDateBR(addDays(baseDate, -1));
+
+      const valueToPaySaturday = getValueForDate(finances, saturdayDate);
+      const valueToPaySunday = getValueForDate(finances, sundayDate);
+
+      return {
+        ...supplier,
+        paymentDate,
+        weekday,
+        valueToPay: valueForPaymentDate + valueToPaySaturday + valueToPaySunday,
+      };
+    }
+
     return {
       ...supplier,
       paymentDate,
       weekday,
-      valueToPay: financeForPaymentDate?.valueAccountsPayable || 0,
+      valueToPay: valueForPaymentDate || 0,
     };
   }, [supplier, finances]);
 
@@ -179,7 +196,13 @@ const SupplierCard = ({ supplier, updateSupplierList }: SupplierCardProps) => {
           )}
           <span className="text-xs text-nowrap">
             {" "}
-            {supplierWithFinance.weekday}
+            {supplierWithFinance.weekday === "segunda-feira" ? (
+              <>
+                (Segunda-feira) + <span className="text-red-500">FDS</span>
+              </>
+            ) : (
+              supplierWithFinance.weekday
+            )}
           </span>
         </div>
         <Dialog
