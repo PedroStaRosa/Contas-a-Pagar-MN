@@ -16,11 +16,15 @@ export const SupplierFormSchema = z.object({
   company_name: z.string().min(1, {
     message: "Razão social é obrigatória.",
   }),
-  payment_term: z.coerce
-    .number({
-      required_error: "Prazo de pagamento é obrigatório.",
-    })
-    .min(1, { message: "O prazo não pode ser negativo ou zero." }),
+  payment_term: z
+    .array(
+      z.object({
+        value: z
+          .number({ invalid_type_error: "Informe um número" })
+          .positive("Deve ser maior que 0"),
+      }),
+    )
+    .min(1, "Adicione pelo menos um prazo"),
 });
 
 export const loginFormSchema = z.object({

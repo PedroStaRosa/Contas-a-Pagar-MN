@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusCircleIcon, Search } from "lucide-react";
+import { Loader2, PlusCircleIcon, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import SupplierCard from "@/components/supplierCard";
@@ -30,7 +30,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { type SupplierFormData, SupplierFormSchema } from "@/schema/schemas";
-import { createSupplier, fetchSuppliers } from "@/services/supplierService";
+import {
+  createSupplier,
+  deleteSupplier,
+  fetchSuppliers,
+} from "@/services/supplierService";
 import type { Supplier } from "@/types/supplier";
 import { formatCNPJ } from "@/utils/utils";
 
@@ -40,8 +44,12 @@ const Suppliers = () => {
     defaultValues: {
       cnpj: "",
       company_name: "",
-      payment_term: 0,
+      payment_term: [],
     },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "payment_term",
   });
 
   const [open, setOpen] = useState(false);
@@ -54,11 +62,13 @@ const Suppliers = () => {
     // Logic to handle form submission
     try {
       setLoading(true);
-      const supplierData = {
+
+      const supplierData: Supplier = {
         ...data,
-        id: data.cnpj.replace(/\D/g, ""), // Use CNPJ as ID
+        id: data.cnpj.replace(/\D/g, ""),
         created_at: new Date(),
         updated_at: new Date(),
+        payment_term: data.payment_term.map((p) => p.value), // Aqui converte [{ value }] => [30, 60]
       };
       const response = await createSupplier(supplierData);
       if (response.status) {
@@ -135,12 +145,45 @@ const Suppliers = () => {
     toast.success("Fornecedor encontrado.");
   };
 
+  const handleDeleteSupplier = async (id: string) => {
+    try {
+      setLoading(true);
+      console.log(id);
+      if (!id) {
+        toast.error("Fornecedor não encontrado.");
+        return;
+      }
+      const response = await deleteSupplier(id);
+      if (response.status) {
+        toast.success(response.message);
+        fetchSuppliersData();
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.error(
+        "❌ Ocorreu um erro ao deletar o fornecedor. Tente novamente.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchSuppliersData();
-  }, []);
+  }, [suppliers.length]);
 
   return (
     <div className="flex min-h-screen flex-col gap-6 bg-gray-50 p-6">
+      {loading && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/40 backdrop-blur-sm">
+          <span className="text-4xl font-bold text-orange-700">
+            <Loader2 className="animate-spin" size={40} />
+          </span>
+        </div>
+      )}
       <h1 className="text-xl">Fornecedores</h1>
       <Card>
         <CardHeader>
@@ -195,7 +238,7 @@ const Suppliers = () => {
                 open={open}
                 onOpenChange={(state) => {
                   setOpen(state);
-                  if (!state) form.reset(); // Zera campos ao fechar
+                  if (!state) form.reset();
                 }}
               >
                 <DialogContent>
@@ -255,27 +298,53 @@ const Suppliers = () => {
                             </FormItem>
                           )}
                         />
-                        <FormField
-                          control={form.control}
-                          name="payment_term"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="flex items-center justify-between">
-                                <FormLabel>Prazo de pagamento</FormLabel>{" "}
-                                <FormMessage />
-                              </div>
+                        <div className="space-y-2">
+                          <FormLabel>Prazo de pagamento (dias)</FormLabel>
+                          <FormMessage />
+                          {fields.map((item, index) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name={`payment_term.${index}.value`}
+                              render={({ field }) => (
+                                <FormItem className="flex items-start gap-2">
+                                  <div>
+                                    <FormMessage />
+                                  </div>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      min={1}
+                                      placeholder="Ex: 30"
+                                      className="w-full"
+                                      onChange={(e) =>
+                                        field.onChange(Number(e.target.value))
+                                      }
+                                    />
+                                  </FormControl>
 
-                              <FormControl>
-                                <Input
-                                  placeholder="30"
-                                  {...field}
-                                  type="number"
-                                  min={0}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => remove(index)}
+                                  >
+                                    Remover
+                                  </Button>
+                                </FormItem>
+                              )}
+                            />
+                          ))}
+
+                          <Button
+                            type="button"
+                            onClick={() => append({ value: 0 })}
+                            className="mt-2"
+                            variant="outline"
+                          >
+                            Adicionar prazo
+                          </Button>
+                        </div>
                         <Button
                           type="submit"
                           className="w-full"
@@ -298,14 +367,13 @@ const Suppliers = () => {
           <CardDescription>Lista de fornecedores cadastrados</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Placeholder for suppliers list */}
           {suppliers.length > 0 ? (
             <ul className="space-y-2">
               {suppliers.map((supplier) => (
                 <SupplierCard
                   key={supplier.id}
                   supplier={supplier}
-                  updateSupplierList={fetchSuppliersData}
+                  onDelete={() => handleDeleteSupplier(supplier.id)}
                 />
               ))}
             </ul>

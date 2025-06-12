@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import type { Finances } from "@/types/finances";
@@ -59,4 +59,9 @@ export function getValueForDate(
 ): number {
   const entry = finances.find((f) => f.date === dateString);
   return entry?.valueAccountsPayable || 0;
+}
+
+export function calcAddDays(days: number): Date {
+  const paymentDate = formatDateBR(addDays(new Date(), days));
+  return parseDateBR(paymentDate);
 }
