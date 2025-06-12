@@ -29,6 +29,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { type SupplierFormData, SupplierFormSchema } from "@/schema/schemas";
 import {
   createSupplier,
@@ -56,6 +57,7 @@ const Suppliers = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [originalSuppliers, setOriginalSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingSuppliers, setLoadingSuppliers] = useState(false);
   const [filterValues, setFilterValues] = useState({
     cnpj: "",
     companyName: "",
@@ -91,6 +93,7 @@ const Suppliers = () => {
 
   const fetchSuppliersData = async () => {
     try {
+      setLoadingSuppliers(true);
       // Fetch suppliers from the database
       const suppliersResponse = await fetchSuppliers();
 
@@ -101,6 +104,8 @@ const Suppliers = () => {
       setOriginalSuppliers(suppliersResponse); // Store original suppliers for filtering
     } catch {
       toast.error("Erro ao buscar fornecedores.");
+    } finally {
+      setLoadingSuppliers(false);
     }
   };
 
@@ -196,7 +201,6 @@ const Suppliers = () => {
   };
 
   useEffect(() => {
-    console.log("Recarregou...");
     fetchSuppliersData();
   }, []);
 
@@ -391,18 +395,31 @@ const Suppliers = () => {
           <CardDescription>Lista de fornecedores cadastrados</CardDescription>
         </CardHeader>
         <CardContent>
-          {suppliers.length > 0 ? (
-            <ul className="space-y-2">
-              {suppliers.map((supplier) => (
-                <SupplierCard
-                  key={supplier.id}
-                  supplier={supplier}
-                  onDelete={() => handleDeleteSupplier(supplier.id)}
-                />
-              ))}
-            </ul>
+          {loadingSuppliers ? (
+            <div className="flex flex-col space-y-3">
+              <p>Buscando...</p>
+              <Skeleton className="h-4 w-80 rounded-xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
           ) : (
-            <p>Nenhum fornecedor cadastrado</p>
+            <div>
+              {suppliers.length > 0 ? (
+                <ul className="space-y-2">
+                  {suppliers.map((supplier) => (
+                    <SupplierCard
+                      key={supplier.id}
+                      supplier={supplier}
+                      onDelete={() => handleDeleteSupplier(supplier.id)}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p>Nenhum fornecedor cadastrado</p>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
