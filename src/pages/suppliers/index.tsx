@@ -56,6 +56,10 @@ const Suppliers = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [originalSuppliers, setOriginalSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filterValues, setFilterValues] = useState({
+    cnpj: "",
+    companyName: "",
+  });
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const onSubmit = async (data: SupplierFormData) => {
@@ -100,7 +104,15 @@ const Suppliers = () => {
     }
   };
 
-  const handleFilterSuppilers = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilterSuppilersByCompanyName = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const newName = e.target.value;
+    setFilterValues((prev) => ({
+      ...prev,
+      companyName: newName,
+      cnpj: newName ? "" : prev.cnpj, // Limpa se nome for preenchido
+    }));
     // Debounce the filter input to avoid excessive filtering
     const filterValue = e.target.value.toLowerCase();
 
@@ -113,18 +125,14 @@ const Suppliers = () => {
         setSuppliers(originalSuppliers); // Reset to original suppliers if filter is empty
         return;
       }
-      // Filter suppliers based on CNPJ or company name
-      const filteredSuppliers = suppliers.filter((supplier) => {
-        const companyName = supplier.cnpj;
-        return (
-          companyName.includes(filterValue) ||
-          supplier.company_name.toLowerCase().includes(filterValue)
-        );
+      // Filter suppliers based on company name
+      const filteredSuppliers = originalSuppliers.filter((supplier) => {
+        return supplier.company_name.toLowerCase().includes(filterValue);
       });
       setSuppliers(filteredSuppliers);
     }, 300); // Debounce the filter input
   };
-
+  // Filter suppliers based on CNPJ
   const handleFilterSuppilersByCnpj = () => {
     const cnpj = document.getElementById("cnpj_company") as HTMLInputElement;
     if (!cnpj || !cnpj.value) {
@@ -132,7 +140,7 @@ const Suppliers = () => {
       toast.info("Informe um CNPJ para pesquisar.");
       return;
     }
-    const findedSupplier = suppliers.find(
+    const findedSupplier = originalSuppliers.find(
       (supplier) => supplier.cnpj === cnpj.value,
     );
     if (!findedSupplier) {
@@ -171,9 +179,26 @@ const Suppliers = () => {
     }
   };
 
+  const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cnpj = document.getElementById("cnpj_company") as HTMLInputElement;
+    if (!cnpj.value) {
+      setSuppliers(originalSuppliers);
+      return;
+    }
+    const formattedValue = formatCNPJ(e.target.value);
+    cnpj.value = formattedValue;
+    const newCnpj = formattedValue;
+    setFilterValues((prev) => ({
+      ...prev,
+      cnpj: newCnpj,
+      companyName: newCnpj ? "" : prev.companyName, // Limpa se CNPJ for preenchido
+    }));
+  };
+
   useEffect(() => {
+    console.log("Recarregou...");
     fetchSuppliersData();
-  }, [suppliers.length]);
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col gap-6 bg-gray-50 p-6">
@@ -197,13 +222,11 @@ const Suppliers = () => {
                 <Input
                   placeholder="99.999.999/0001-99"
                   type="text"
-                  onChange={(e) => {
-                    const formattedValue = formatCNPJ(e.target.value);
-                    e.target.value = formattedValue;
-                  }}
+                  onChange={handleCnpjChange}
                   id="cnpj_company"
                   name="cnpj_company"
                   maxLength={18}
+                  disabled={!!filterValues.companyName}
                 />
                 <div className="bg-primary flex h-10 items-center justify-center rounded-lg px-2 text-white md:hidden">
                   <Search size={32} onClick={handleFilterSuppilersByCnpj} />
@@ -219,7 +242,8 @@ const Suppliers = () => {
                 type="text"
                 placeholder="Razão social"
                 className=""
-                onChange={handleFilterSuppilers}
+                onChange={handleFilterSuppilersByCompanyName}
+                disabled={!!filterValues.cnpj}
               />
               <span className="text-sm text-gray-500">
                 Razão social do fornecedor é dinnamicamente filtrada.
