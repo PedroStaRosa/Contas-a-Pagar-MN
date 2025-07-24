@@ -7,7 +7,7 @@ import { z } from "zod";
 import { UserContext } from "@/contexts/userContext";
 import { getUser } from "@/services/userService";
 import type { Finances } from "@/types/finances";
-import { getTotalReceived } from "@/utils/utils";
+import { getIsWeekend, getTotalReceived } from "@/utils/utils";
 
 import FinanceTable from "../financeTable";
 import { Button } from "../ui/button";
@@ -45,18 +45,6 @@ const PaymentsOverview = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof balanceSchema>) => {
-    if (values.startingBalanceForm < 0) {
-      form.setError("startingBalanceForm", {
-        type: "custom",
-        message: "O valor deve ser maior que zero",
-      });
-      return;
-    }
-    setBalanceOfDay(values.startingBalanceForm);
-    updateBalanceToDay(values.startingBalanceForm);
-  };
-
   const updateBalanceToDay = (initialBalance: number) => {
     if (typeof initialBalance !== "number" || isNaN(initialBalance)) return;
 
@@ -67,6 +55,12 @@ const PaymentsOverview = () => {
       itemsToIterate = finances.slice(1);
     }
     const balanceupdated = itemsToIterate.map((obj) => {
+      const isWeekend = getIsWeekend(obj);
+      if (isWeekend) {
+        return {
+          ...obj,
+        };
+      }
       const totalReceived = getTotalReceived(obj);
       const totalPayable = obj.valueAccountsPayable ?? 0;
       const balance = previousBalance + totalReceived - totalPayable;
@@ -112,6 +106,18 @@ const PaymentsOverview = () => {
     setDates(finances);
     getLastUpdatedPayment();
   }, [finances]);
+
+  const onSubmit = (values: z.infer<typeof balanceSchema>) => {
+    if (values.startingBalanceForm < 0) {
+      form.setError("startingBalanceForm", {
+        type: "custom",
+        message: "O valor deve ser maior que zero",
+      });
+      return;
+    }
+    setBalanceOfDay(values.startingBalanceForm);
+    updateBalanceToDay(values.startingBalanceForm);
+  };
 
   return (
     <Card className="">
