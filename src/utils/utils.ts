@@ -65,3 +65,9 @@ export function calcAddDays(days: number): Date {
   const paymentDate = formatDateBR(addDays(new Date(), days));
   return parseDateBR(paymentDate);
 }
+
+export function getIsWeekend(finance: Finances): boolean {
+  const [day, month, year] = finance.date.split("/").map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.getDay() === 0 || date.getDay() === 6; // 0 = Domingo, 6 = Sábado
+}

@@ -1,17 +1,11 @@
 import type { Finances } from "@/types/finances";
-import { formatCurrency, getTotalReceived } from "@/utils/utils";
+import { formatCurrency, getIsWeekend, getTotalReceived } from "@/utils/utils";
 
-import { Button } from "../ui/button";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "../ui/hover-card";
+import FinanceTableRow from "../financeTableRow";
 import {
   Table,
   TableBody,
   TableCaption,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -36,56 +30,15 @@ const FinanceTable = ({ finances }: FinanceTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {finances.map((finance) => {
-              const [day, month, year] = finance.date.split("/").map(Number);
-              const date = new Date(year, month - 1, day); // mês é 0-indexado
-              const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-              return (
-                <TableRow key={finance.id} className="">
-                  <TableCell
-                    className={`font-medium ${isWeekend ? "text-red-600 line-through" : ""}`}
-                  >
-                    {isWeekend ? `${finance.date} (FDS)` : finance.date}
-                  </TableCell>
-                  <TableCell>
-                    <HoverCard>
-                      <HoverCardTrigger>
-                        <Button variant="ghost" className="text-green-500">
-                          {formatCurrency(getTotalReceived(finance))}
-                        </Button>
-                      </HoverCardTrigger>
-                      <HoverCardContent className="">
-                        <div className="flex flex-col gap-2">
-                          <span>
-                            Credito: {formatCurrency(finance.credito)}
-                          </span>
-                          <span>Debito: {formatCurrency(finance.debito)}</span>
-                          <span>Pix: {formatCurrency(finance.pix)}</span>
-                          <span>Alelo: {formatCurrency(finance.alelo)}</span>
-                          <span>Vr: {formatCurrency(finance.vr)}</span>
-                          <span>Sodexo: {formatCurrency(finance.sodexo)}</span>
-                          <span>
-                            Dinheiro: {formatCurrency(finance.dinheiro)}
-                          </span>
-                        </div>
-                      </HoverCardContent>
-                    </HoverCard>
-                  </TableCell>
-                  <TableCell className="text-red-500">
-                    {finance.valueAccountsPayable
-                      ? formatCurrency(finance.valueAccountsPayable)
-                      : 0}
-                  </TableCell>
-                  <TableCell
-                    className={`text-lg font-bold ${finance.balanceOfDay! <= 0 ? "text-red-500" : "text-green-500"} `}
-                  >
-                    {finance.balanceOfDay
-                      ? formatCurrency(finance.balanceOfDay!)
-                      : ""}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {finances
+              // Atravez da funcao getIsWeekend, filtramos os fins de semana para nao serem exibidos.
+              .filter((finance) => {
+                const isWeekend = getIsWeekend(finance);
+                return !isWeekend;
+              })
+              .map((finance) => (
+                <FinanceTableRow key={finance.date} finance={finance} />
+              ))}
           </TableBody>
         </Table>
       </div>
