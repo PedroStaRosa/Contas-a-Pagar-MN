@@ -1,55 +1,46 @@
-# React + TypeScript + Vite
+# Contas‑a‑Pagar‑MN
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sistema frontend para gerenciamento de contas a pagar desenvolvido com **React + TypeScript + Vite + Firebase**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🧠 Descrição
 
-## Expanding the ESLint configuration
+Aplicação web desenvolvida para auxiliar na gestão de contas a pagar no ambiente de trabalho. A ferramenta permite:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Visualizar contas por data de vencimento;
+- Analisar a previsão de saldo no fluxo de caixa;
+- Cadastrar fornecedores com prazos de pagamento;
+- Identificar possíveis gargalos financeiros futuros, com base nos compromissos assumidos.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+A interface é moderna e voltada para uma boa experiência do usuário, integrando dados de fornecedores e projeções financeiras em um só lugar.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ⚙️ Tecnologias Utilizadas
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
-# Contas-a-Pagar-MN
+- ⚛️ React  
+- 🟦 TypeScript  
+- ⚡ Vite  
+- 🔥 Firebase (Auth + Firestore )  
+- 🎨 Shadcn UI  
+- 🧹 ESLint + Prettier  
+
+---
+
+## 🚀 Funcionalidades
+
+- 📋 **Listagem de contas a pagar** com detalhes por fornecedor e vencimento
+- ➕ **Cadastro de fornecedores** com CNPJ, razão social e prazos de pagamento
+- 📁 **Importação de valores a pagar** via planilha `.xls`
+- 💰 **Previsão de saldo de caixa**, com destaque visual de dias com saldo negativo
+- 🔍 **Busca e ordenação de fornecedores**
+- 📆 **Visualização por data**, com controle de vencimentos e prazos
+
+---
+
+## 🖼️ Screenshots
+
+![App Screenshot](https://res.cloudinary.com/dofu14mb0/image/upload/v1753468489/PROJETO_CONTA_PAGAR_MN_hal5iz.png)
+
+---
