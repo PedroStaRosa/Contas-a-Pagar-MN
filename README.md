@@ -1,6 +1,6 @@
 # Contas‑a‑Pagar‑MN
 
-Sistema frontend para gerenciamento de contas a pagar desenvolvido com **React + TypeScript + Vite + Firebase**.
+Sistema frontend para gerenciamento de contas a pagar desenvolvido com **React + TypeScript + Vite + Firebase** com integraçao via planilha .xls do nosso ERP atual da empresa.
 
 ---
 
