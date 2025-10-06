@@ -45,4 +45,5 @@ dist-ssr
 *.njsproj
 
 *.env
+CODE_REVIEW.md
 

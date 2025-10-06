@@ -17,7 +17,7 @@ type UserContextType = {
   finances: Finances[];
   login: (email: string, password: string) => Promise<User | null>;
   logout: () => void;
-  getFinances: () => void;
+  getFinances: (userAuthID: string) => void;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -46,15 +46,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   // Efeito para buscar as finanças do usuário
   useEffect(() => {
     if (userAuth?.uid) {
-      getFinances();
+      getFinances(userAuth?.uid);
     }
   }, [userAuth?.uid]);
 
-  const getFinances = async () => {
+  const getFinances = async (userAuthID: string) => {
     try {
-      const reponse = await fetchFinances();
-      setFinances(reponse);
-    } catch {
+      const response = await fetchFinances(userAuthID);
+      setFinances(response);
+    } catch{
       throw new Error("Erro ao buscar finanças");
     }
   };

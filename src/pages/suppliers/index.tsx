@@ -161,7 +161,7 @@ const Suppliers = () => {
   const handleDeleteSupplier = async (id: string) => {
     try {
       setLoading(true);
-      console.log(id);
+      /* console.log(id); */
       if (!id) {
         toast.error("Fornecedor não encontrado.");
         return;

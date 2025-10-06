@@ -9,15 +9,15 @@ const DashboardPage = () => {
       <main className="flex flex-col gap-4">
         <section className="flex w-full max-w-screen-2xl flex-col gap-6 sm:flex-row">
           <div className="w-full p-4">
-            <FinanceCalendarPage />
+        <FinanceCalendarPage />
           </div>
           <div className="w-full p-4">
-            <AccountsPayableReader />
+          <AccountsPayableReader /> 
           </div>
         </section>
         <Separator />
         <section className="">
-          <PaymentsOverview />
+       <PaymentsOverview />
         </section>
       </main>
     </div>
