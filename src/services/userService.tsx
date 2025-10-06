@@ -8,7 +8,8 @@ export const getUser = async (uid: string) => {
     const userSnapshot = await getDoc(userRef);
     if (userSnapshot.exists()) {
       return userSnapshot.data();
-    } else {
+    } else{
+      
       throw new Error("Usuário não encontrado");
     }
   } catch {

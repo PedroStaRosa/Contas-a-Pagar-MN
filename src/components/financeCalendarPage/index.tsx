@@ -117,7 +117,7 @@ const FinanceCalendarPage = () => {
       }
 
       toast.success(response.message);
-      getFinances();
+      getFinances(userAuth.uid);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message);

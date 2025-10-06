@@ -88,7 +88,8 @@ const AccountsPayableReader = () => {
       await atualizarOuCriarValorAPagar(valores, userAuth.uid);
       toast.success("Contas a pagar atualizadas com sucesso!");
       handleClearFile();
-    } catch {
+    } catch (error){
+      /* console.error(error) */
       toast.error("Erro ao atualizar as contas a pagar:");
     } finally {
       setIsLoading(false);
