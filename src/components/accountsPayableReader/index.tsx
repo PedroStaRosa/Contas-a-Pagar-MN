@@ -15,6 +15,11 @@ type ValoresPorData = {
   valor: number;
 };
 
+interface XLSRowRaw {
+  "Relatório de Contas a Pagar - Consolidado": string;
+  _11: string | number;
+}
+
 const AccountsPayableReader = () => {
   const [valores, setValores] = useState<ValoresPorData[]>([]);
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(
@@ -44,13 +49,16 @@ const AccountsPayableReader = () => {
       const data = new Uint8Array(evt.target?.result as ArrayBuffer);
       const workbook = XLSX.read(data, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      const jsonData = XLSX.utils.sheet_to_json<XLSRowRaw>(sheet, {
+        defval: "",
+      });
 
       const valoresExtraidos: ValoresPorData[] = [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jsonData.forEach((row: any) => {
+
+      jsonData.forEach((row) => {
         const vencimento = row["Relatório de Contas a Pagar - Consolidado"];
-        const valorRaw = row["_18"];
+        const valorRaw = row["_11"];
+
         if (!vencimento || !valorRaw) return;
 
         // Tratando valor no formato brasileiro: "14.047,97" => 14047.97
@@ -88,7 +96,7 @@ const AccountsPayableReader = () => {
       await atualizarOuCriarValorAPagar(valores, userAuth.uid);
       toast.success("Contas a pagar atualizadas com sucesso!");
       handleClearFile();
-    } catch (error){
+    } catch {
       /* console.error(error) */
       toast.error("Erro ao atualizar as contas a pagar:");
     } finally {
